@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>学生首页</title>
+    <link rel="stylesheet" type="text/css" href="css/const/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="css/common.css" />
+</head>
+<script src="js/const/vue.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/const/vue-resource.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/const/jquery-3.3.1.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/const/popper.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/const/bootstrap.js" type="text/javascript" charset="utf-8"></script>
+<body>
+<div id="app">
+    <div class="top-student text-right">
+        当前登陆用户为：
+        <input type="hidden" v-model="userId" value="${currentUser.id}">
+        <span @click="showOut=!showOut">${currentUser.name}</span>
+        <ul v-show="showOut">
+            <li><a href="">注销</a></li>
+        </ul>
+    </div>
+    <div>
+        当前积分为：<span>${currentUser.point}</span>
+        <!-- Button trigger modal -->
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#integralRecordModal" @click="getIntegralRecordList">
+            查看积分详情
+        </button>
+        <!-- Modal -->
+        <div class="modal fade bd-example-modal-xl" id="integralRecordModal">
+            <div class="modal-dialog modal-xl" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="integralRecordModal">积分加减详情</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- 筛选项 -->
+                        <div class="dropdown">
+                            <a class="btn btn-secondary dropdown-toggle mb-3" href="#" id="filter_items" data-toggle="dropdown">
+                                筛选项
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="filter_items">
+                                <a class="dropdown-item" href="javascript:;" @click="recordExShow = -1">全部</a>
+                                <a class="dropdown-item" href="javascript:;" @click="recordExShow = 0">加分项</a>
+                                <a class="dropdown-item" href="javascript:;" @click="recordExShow = 1">减分项</a>
+                            </div>
+                        </div>
+                        <!-- 详情表格 -->
+                        <table class="table text-center">
+                            <thead class="thead-light">
+                            <tr>
+                                <th scope="col">详情</th>
+                                <th scope="col">积分</th>
+                                <th scope="col">加减</th>
+                                <th scope="col">日期</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr v-for="record in integralRecordList" :key="record.id" v-show="record.isAdd != recordExShow">
+                                <td>{{record.causeId}}</td>
+                                <td>{{record.point}}</td>
+                                <td>{{record.isAdd == 0 ? "减":"加"}}</td>
+                                <td>{{record.creationTime | dateFormat}}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <div class="text-right">总计：{{userpoint}}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <a href="">查看奖品</a>
+    </div>
+    <div>
+        本班当前积分为：<span v-cloak>{{gradepoint}}</span>
+    </div>
+    <div class="text-center">
+        班级积分排行榜TOP3
+        <table class="table">
+            <thead class="thead-light">
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">班级</th>
+                <th scope="col">积分</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="(grade,i) in gradeList.slice(0,3)" :key="grade.id">
+                <th scope="row">{{i}}</th>
+                <td>{{grade.name}}</td>
+                <td>{{grade.point}}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+<script type="text/javascript">
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            username: '张家豪',
+            userpoint: 100, // 个人积分
+            gradepoint: 300, // 当前班级积分
+            showOut: false, // 是否显示注销选项
+            gradeList: '', // 班级top3集合
+            integralRecordList: '', // 个人加扣分详情集合
+            recordExShow: -1, // 设置加扣分筛选编号 -1为全部 0为加分 1为减分
+            userId: 0 // 当前登陆用户的id
+        },
+        methods: {
+            /**
+             * 初始化当前班级积分
+             */
+            getGradePoint() {
+                this.$http.get('grade/getPointByGradeId').then(result => {
+                    var result = result.body
+                    if (result.Code == 200) {
+                    this.gradepoint = result.Data
+                } else if (result.Code == 500) {
+                    alert("初始化班级积分出现异常，请联系管理员")
+                }
+            })
+            },
+            /**
+             * 初始化班级排行
+             */
+            getGradeList() {
+                this.$http.get('grade/getGradeListByPoint').then(result => {
+                    var result = result.body
+                    if (result.Code == 200) {
+                    this.gradeList = result.Data
+                } else if (result.Code == 500) {
+                    alert("初始化班级top3出现异常，请联系管理员")
+                }
+            })
+            },
+            /**
+             * 获取扣加分详情集合
+             */
+            getIntegralRecordList() {
+                this.recordExShow = -1; // 每次点击重新查询全部
+                this.$http.get('point/getIntegralRecordUserList?userId='+this.userId).then(result => {
+                    var result = result.body
+                    if(result.Code == 200){
+                    this.integralRecordList = result.Data
+                }else if(result.Code == 500){
+                    alert("获取扣加分详情出现异常，请联系管理员")
+                }
+            })
+            }
+        },
+        created() {
+            // 调用初始化方法
+            this.getGradePoint()
+            this.getGradeList()
+        }
+    })
+
+    // 全局过滤器:过滤时间
+    Vue.filter("dateFormat", function(dateStr) {
+        var now = new Date(dateStr);
+        var year = now.getFullYear();
+        var month = (now.getMonth() + 1).toString().padStart(2, '0');
+        var day = now.getDate().toString().padStart(2, '0');
+        var hour = now.getHours().toString().padStart(2, '0');
+        var minute = now.getMinutes().toString().padStart(2, '0');
+        var seconds = now.getSeconds().toString().padStart(2, '0');
+
+        return year+"-"+month+"-"+day+" "+hour+":"+minute+":"+seconds
+    })
+</script>
+</html>

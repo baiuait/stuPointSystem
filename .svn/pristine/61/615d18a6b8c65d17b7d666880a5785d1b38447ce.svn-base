@@ -1,0 +1,89 @@
+package cn.bdqn.controller;
+
+import cn.bdqn.pointsystem.emtitys.Cause;
+import cn.bdqn.pointsystem.service.CauseService;
+import cn.bdqn.pointsystem.utlis.ReturnResult;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.List;
+import java.util.Map;
+
+/**
+ * @Classname CauseController
+ * @Description 奖罚表
+ * @Date 2019/12/27 17:46
+ * @Created by zhaomengliang
+ */
+@Controller
+@RequestMapping("/cause")
+@ResponseBody
+public class CauseController {
+    @Autowired
+    private CauseService causeService;
+
+    @GetMapping("/list")
+    public List<Cause> getCauseList(){
+        List<Cause> list=causeService.getCauses();
+        return list;
+    }
+    @GetMapping("/add")
+    public String addCause(String cause){
+        Cause cause1=new Cause();
+        cause1.setCause(cause);
+        int a =causeService.AddCause(cause1);
+        if(a==1){
+            return "添加成功！";
+        }
+        return "添加失败！";
+    }
+
+    @GetMapping("/del")
+    public String delCause(int id){
+        Cause cause1=new Cause();
+        cause1.setId(id);
+        int a =causeService.delCause(cause1);
+        if(a==1){
+            return "删除成功！";
+        }
+        return "删除失败！";
+    }
+
+    /**
+     * 查询奖罚原因的请求
+     * @param causeId 奖罚编号
+     * @return
+     */
+    @GetMapping("/getCauseById")
+    public Map<String,Object> getCauseById(@RequestParam Integer causeId){
+        Map<String,Object> map = null;
+        Cause cause = causeService.findCauseById(causeId);
+        if (null == cause){
+            map = ReturnResult.returnFail(null,null,500);
+        }else {
+            map = ReturnResult.returnSuccess(null,cause);
+        }
+        return map;
+    }
+
+    /**
+     * 查询所有奖罚数据
+     * @return
+     * @auther yajun
+     */
+    @GetMapping("/getCauses")
+    public Map<String,Object> getCauses(){
+        Map<String,Object> map =null;
+        List<Cause> causes = causeService.getCauses();
+        if (null==causes||causes.size()<1){
+            map = ReturnResult.returnFail(null,null,500);
+        }else {
+            map = ReturnResult.returnSuccess(null,causes);
+        }
+        return map;
+    }
+}

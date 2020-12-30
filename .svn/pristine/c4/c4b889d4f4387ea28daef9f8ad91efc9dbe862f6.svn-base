@@ -1,0 +1,22 @@
+package cn.bdqn.pointsystem.emtitys;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.Date;
+
+/**
+ * 奖品兑换记录表
+ */
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class PrizeExchangeRecord {
+
+  private Integer id;//积分编号
+  private Integer userId;//用户id
+  private Integer prizeId;//积分id
+  private Date creationTime;//兑换时间
+
+}

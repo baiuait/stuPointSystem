@@ -1,0 +1,52 @@
+package cn.bdqn.pointsystem.service.impl;
+
+import cn.bdqn.pointsystem.dao.PrizeExchangeRecordMapper;
+import cn.bdqn.pointsystem.dao.PrizeMapper;
+import cn.bdqn.pointsystem.dao.UserMapper;
+import cn.bdqn.pointsystem.emtitys.Prize;
+import cn.bdqn.pointsystem.emtitys.PrizeExchangeRecord;
+import cn.bdqn.pointsystem.emtitys.User;
+import cn.bdqn.pointsystem.service.PrizeExchangeRecordService;
+import cn.bdqn.pointsystem.service.PrizeService;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Date;
+
+/**
+ * @author yajun
+ * @create 2019/12/31
+ */
+@Service
+public class PrizeExchangeRecordServiceImpl implements PrizeExchangeRecordService {
+    //奖品兑换记录数据层
+    @Autowired
+    private PrizeExchangeRecordMapper exchangeRecordMapper;
+    //奖品数据层
+    @Autowired
+    private PrizeMapper prizeMapper;
+    //用户数据层
+    @Autowired
+    private UserMapper userMapper;
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean exchangePrizes(Integer userId,Integer prizeId,Integer point) throws Exception {
+        Integer result=0;
+            //1。添加一条兑换记录
+            PrizeExchangeRecord prizeExchangeRecord = new PrizeExchangeRecord();
+            prizeExchangeRecord.setUserId(userId);
+            prizeExchangeRecord.setPrizeId(prizeId);
+            result = exchangeRecordMapper.insert(prizeExchangeRecord);
+            if (result==0) throw new Exception("添加兑换奖品记录异常");
+            //2.减去兑换的奖品数量 -1
+            result = prizeMapper.updatePrizeNumber(prizeId);
+            if (result==0) throw new Exception("修改商品数量异常");
+            result = userMapper.updateUserPoint(point,userId);
+            if (result==0)throw new Exception("修改学生积分异常");
+            return true;
+    }
+}

@@ -1,0 +1,70 @@
+package cn.bdqn.controller;
+
+
+import cn.bdqn.pointsystem.emtitys.User;
+import cn.bdqn.pointsystem.service.IntegralRecordService;
+import cn.bdqn.pointsystem.service.UserService;
+import cn.bdqn.pointsystem.utlis.Constant;
+import cn.bdqn.pointsystem.utlis.ReturnResult;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * @author yajun
+ * @create 2019/12/27
+ */
+@RestController
+@RequestMapping("/user")
+public class UserController {
+
+    @Autowired
+    private UserService userService;
+    //积分增删
+    @Autowired
+    private IntegralRecordService recordService;
+
+    @GetMapping("/list")
+    public List<User> listUser(){
+        return userService.userList();
+    }
+
+    /**
+     * 登陆方法
+     * @param identity 身份证号
+     * @param name 用户名
+     * @param session
+     * @return
+     */
+    @GetMapping("/login")
+    public Map<String,Object> login(@RequestParam String identity, @RequestParam String name,
+                     HttpSession session){
+        User user = userService.login(identity, name);
+        Map<String, Object> map=null;
+        if (null==user){
+            //判断身份证是否存在
+            if (null==userService.findUserByidentity(identity)){
+                //为空返回5002，身份证不存在
+                 map = ReturnResult.returnFail(null, null, 5002);
+            }else {
+                //返回5003，身份存在，则用户名不匹配
+                map = ReturnResult.returnFail(null,null,5003);
+            }
+        }else {
+            //保存用户到session对象中
+            session.setAttribute(Constant.CURRENT_USER, user);
+            //登陆成功
+            map = ReturnResult.returnSuccess(null,user.getIsAdmin());
+        }
+        return map;
+    }
+
+}

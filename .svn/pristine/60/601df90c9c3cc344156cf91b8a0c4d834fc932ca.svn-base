@@ -1,0 +1,22 @@
+package cn.bdqn.pointsystem.service;
+
+import cn.bdqn.pointsystem.emtitys.IntegralRecord;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+
+
+import java.util.List;
+
+/**
+ * @author yajun
+ * @create 2019/12/30
+ */
+public interface IntegralRecordService {
+
+    /**
+     * 根据用户或班级的id查询增加减去的积分详情
+     * @param UserId 用户id
+     * @param GradeId 班级id
+     * @return
+     */
+    List<IntegralRecord> findIntegralRecordById(Integer UserId,Integer GradeId);
+}

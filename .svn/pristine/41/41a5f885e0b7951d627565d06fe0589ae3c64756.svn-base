@@ -1,0 +1,28 @@
+package cn.bdqn.pointsystem.dao;
+
+import cn.bdqn.pointsystem.emtitys.Prize;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Mapper;
+
+import java.util.List;
+
+/**
+ * @Classname PrizeMapper
+ * @Description  奖品
+ * @Date 2019/12/30 10:39
+ * @Created by zhangshilong
+ */
+@Mapper
+public interface PrizeMapper extends BaseMapper<Prize> {
+
+
+    List<Prize> SelectPrize();
+
+    int DeletePrize(int id);
+
+    int InsertPrize(Prize prize);
+
+    int UpdatePrize(Prize prize);
+
+    Prize SelectPrizeOne(int id);
+}

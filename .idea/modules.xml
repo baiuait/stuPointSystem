@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/pointsystem.iml" filepath="$PROJECT_DIR$/pointsystem.iml" />
+      <module fileurl="file://$PROJECT_DIR$/pointsystem-controller/pointsystem-controller.iml" filepath="$PROJECT_DIR$/pointsystem-controller/pointsystem-controller.iml" />
+      <module fileurl="file://$PROJECT_DIR$/pointsystem-api/pointsystemapi.iml" filepath="$PROJECT_DIR$/pointsystem-api/pointsystemapi.iml" />
+      <module fileurl="file://$PROJECT_DIR$/pointsystem-dao/pointsystemdao.iml" filepath="$PROJECT_DIR$/pointsystem-dao/pointsystemdao.iml" />
+      <module fileurl="file://$PROJECT_DIR$/pointsystem-service/pointsystemservice.iml" filepath="$PROJECT_DIR$/pointsystem-service/pointsystemservice.iml" />
+    </modules>
+  </component>
+</project>

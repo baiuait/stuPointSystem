@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>用户信息</title>
+    <link rel="stylesheet" href="/layui/css/layui.css" media="all">
+</head>
+
+<form class="layui-form" >
+    <input type="text" placeholder="用户名" class="userName"/>
+    <input type="button" class="buttonName" value="搜索" onclick="clickUserName();"/>
+    <select id="gradeInfo"  lay-filter="testId" >
+        <option value="0">请选择</option>
+    <#list gradeList as grade>
+        <option value="${grade.id}">${grade.name}</option>
+    </#list>
+    </select>
+    <select  lay-filter="isAdmin">
+        <option value="-1">请选择</option>
+        <option value="1">管理员</option>
+        <option value="0">学生</option>
+    </select>
+</form>
+
+
+
+
+<table id="demo" lay-filter="test">
+
+</table>
+
+<script src="/layui/layui.js"></script>
+<script src="/js/const/jquery-3.3.1.js"></script>
+<script>
+    loadData(null)
+    var gradeId;
+    var arr=[];
+        function clickUserName(){
+            arr[1]=$(".userName").val();
+            loadData();
+        }
+    layui.use(['form'], function () {
+        var form = layui.form;
+        form.on('select(testId)', function(data){
+            if(data.value>0){
+                arr[0]=data.value;
+                loadData();
+            } if(data.value==0) {
+                arr[0]=null;
+                loadData();
+            }
+        });
+    });
+    layui.use(['form'], function () {
+        var form = layui.form;
+        form.on('select(isAdmin)', function(data){
+            if(data.value>-1){
+                arr[2]=data.value;
+                loadData();
+            }  if(data.value==-1) {
+                arr[2]=null;
+                loadData();
+            }
+        });
+    });
+    function loadData(){
+        layui.use('table', function(){
+            var table = layui.table;
+            //第一个实例
+            table.render({
+                elem: '#demo'
+                ,height: 312
+                ,url: '/user/list' //数据接口
+                ,page: true //开启分页
+                ,cols: [[ //表头
+                    {field: 'id', title: 'ID', width:80, sort: true, fixed: 'left'}
+                    ,{field: 'name', title: '用户名', width:80}
+                    ,{field: 'identity', title: '身份证', width:80, sort: true}
+                    ,{field: 'address', title: '地址', width:80}
+                    ,{field: 'point', title: '积分', width: 177}
+                    ,{field: 'gradeId', title: '年级编号', width: 80, sort: true}
+                ]]
+                ,where: {
+                    // //.渲染请求参数(查询条件等)
+                    gradeId: arr[0],
+                    name:arr[1],
+                    isAdmin:arr[2]
+                }
+            });
+        });
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<title>登陆</title>
+		<link rel="stylesheet" type="text/css" href="/css/const/bootstrap.css" />
+		<link rel="stylesheet" type="text/css" href="/css/font-awesome.min.css" />
+		<link rel="stylesheet" type="text/css" href="/css/common.css" />
+		<link rel="stylesheet" type="text/css" href="/css/login.css" />
+	</head>
+	<script src="/js/const/vue.js" type="text/javascript" charset="utf-8"></script>
+	<script src="/js/const/vue-resource.js" type="text/javascript" charset="utf-8"></script>
+	<script src="/js/const/jquery-3.3.1.js" type="text/javascript" charset="utf-8"></script>
+	<body class="login-bg">
+		<div id="app">
+			<div class="login">
+				<div class="message">北大青鸟积分管理登录</div>
+				<div id="darkbannerwrap"></div>
+				<form>
+					<div class="form-group pt-3">
+						<input type="text" id="identity" placeholder="身份证号" v-model="identity" class="form-control " @blur="identityBlur($event)" @input="inputChange($event)" ref="identity" AUTOCOMPLETE="off">
+						<div class="invalid-feedback">{{identityMsg}}</div>
+					</div>
+					<div class="form-group pt-3">
+						<input type="text" id="name" placeholder="姓名" v-model="name" class="form-control" @blur="nameBlur($event)"
+							   ref="name" @input="inputChange($event)" AUTOCOMPLETE="off">
+						<div class="invalid-feedback">{{nameMsg}}</div>
+					</div>
+					<button type="button" class="btn btn-success form-control mt-5" @click="login">登陆</button>
+				</form>
+			</div>
+			<!-- 弹出层 -->
+			<div class="pop-up">
+				<i class="fa fa-circle-o-notch fa-spin fa-3x fa-fw"></i>
+				<p>{{popMessage}}</p>
+			</div>
+		</div>
+	</body>
+	<script type="text/javascript">
+		var vm = new Vue({
+			el: '#app',
+			data: {
+				identity: '', // 输入的身份证号
+				name: '', // 输入的姓名
+				identityMsg: '', // 验证身份证号的信息
+				nameMsg: '', // 验证姓名的信息
+				popMessage: '', // 弹出层显示信息
+			},
+			methods: {
+				/**
+				 * 弹出层弹出方法
+				 */
+				popUp(message) {
+					this.popMessage = message
+					$(".pop-up").slideDown(300); // 显示短信发送窗口
+				},
+				/**
+				 * 弹出层隐藏方法
+				 */
+				popDown() {
+					this.popMessage = ''
+					$(".pop-up").slideUp(300);
+				},
+				/**
+				 * 验证失去焦点方法
+				 * 数据为空 return 0
+				 * 数据验证成功 return 1
+				 * 数据验证失败 return -1
+				 * @param {Object} e 当前元素
+				 * @param {Object} reg 正则表达式
+				 * @param {Object} data 输入数据
+				 */
+				blurCheck(e, reg, data) {
+					var e = $(e);
+					e.removeClass("is-valid")
+					e.removeClass("is-invalid")
+					if (data == "") { //数据为空
+						e.addClass("is-invalid")
+						return 0
+					} else if (reg.test(data)) { // 数据验证成功
+						e.addClass("is-valid")
+						return 1;
+					} else { // 数据验证失败
+						e.addClass("is-invalid")
+						return -1;
+					}
+				},
+				/**
+				 * 身份证文本框失去焦点执行
+				 * @param {Object} e
+				 */
+				identityBlur(e) {
+					var event = e.target
+					var reg = /^\d{17}[\d|x|X]$|^\d{15}$/; // 验证身份证的正则表达式
+					var flag = this.blurCheck(event, reg, this.identity);
+					if (flag == 0) {
+						this.identityMsg = '身份证号不可以为空'
+					} else if (flag == 1) {
+						this.identityMsg = ''
+					} else if (flag == -1) {
+						this.identityMsg = '身份证格式有误，请确认'
+					}
+				},
+				/**
+				 * 文本改变时取消错误样式
+				 */
+				inputChange(e){
+					var event = e.target
+					if(this.identity.length > 1){
+						return true
+					}
+					$(event).removeClass("is-invalid")
+				},
+				/**
+				 * 姓名文本框失去焦点执行
+				 * @param {Object} e
+				 */
+				nameBlur(e) {
+					var event = e.target
+					var reg = new RegExp("[\\u4E00-\\u9FFF]+","g")
+					var flag = this.blurCheck(event, reg, this.name);
+					if (flag == 0) {
+						this.nameMsg = '姓名不可以为空'
+					} else if (flag == 1) {
+						this.nameMsg = ''
+					} else if (flag == -1) {
+						this.nameMsg = '姓名格式有误，请确认'
+					}
+				},
+				/**
+				 * 登陆方法
+				 */
+				login() {
+					// 判断输入是否全部合法
+					var flag = true;
+					// 若所有的input输入框中都有is-valid样式 则flag = true
+					if ($('form').find('.is-invalid').length > 0 || this.name == '' || this.identity == '') {
+						flag = false;
+					}
+					if(flag){
+						//发送登陆请求
+						this.$http.get('user/login?identity=' + this.identity + "&name=" + this.name).then(result => {
+							var result = result.body;
+							// 登陆成功
+							if (result.Code == 200) {
+								this.popUp('登陆成功,即将跳往主页面...')
+								// 判断是否为管理员 --> 跳转至对应页面
+								var url = result.Data == 'admin' ? 'adminIndex ' : 'studentIndex'
+								setTimeout(function() {
+									location.href = url
+								}, 2000);
+							} else if (result.Code == 5002) { // 身份证号尚未保存
+								// 清空input输入框并添加提示信息与错误样式
+								this.identity = ''
+								this.identityMsg = '身份证号尚未保存'
+								$(this.$refs.identity).removeClass('is-valid').addClass('is-invalid').focus()
+							} else if (result.Code == 5003) { // 身份证号与姓名不匹配
+								// 清空input输入框并添加提示信息与错误样式
+								this.name = ''
+								this.nameMsg = '身份证号与姓名不匹配'
+								$(this.$refs.name).removeClass('is-valid').addClass('is-invalid').focus()
+							}
+						})
+					}
+				}
+			},
+			created() {
+				var _this = this;
+				/**
+				 * 全局监听键盘事件: 敲击回车执行login() 
+				 */
+				document.onkeydown = function(e) {
+					var key = window.event.keyCode;
+					if (key == 13) {
+						_this.login()
+					}
+				}
+			}
+		})
+	</script>
+</html>

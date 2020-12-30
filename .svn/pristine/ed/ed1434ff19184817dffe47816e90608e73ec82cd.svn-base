@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="pointsystemapi" />
+        <module name="pointsystem-controller" />
+        <module name="pointsystemservice" />
+        <module name="pointsystemdao" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="pointsystem" target="1.8" />
+      <module name="pointsystem-controller" target="1.8" />
+      <module name="pointsystemapi" target="1.8" />
+      <module name="pointsystemdao" target="1.8" />
+      <module name="pointsystemservice" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="pointsystem" options="-parameters" />
+      <module name="pointsystem-controller" options="-parameters" />
+      <module name="pointsystemapi" options="-parameters" />
+      <module name="pointsystemdao" options="-parameters" />
+      <module name="pointsystemservice" options="-parameters" />
+    </option>
+  </component>
+</project>

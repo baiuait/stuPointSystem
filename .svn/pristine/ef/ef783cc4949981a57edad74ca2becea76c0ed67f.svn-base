@@ -1,0 +1,34 @@
+package cn.bdqn.pointsystem.service.impl;
+
+import cn.bdqn.pointsystem.dao.IntegralRecordMapper;
+import cn.bdqn.pointsystem.emtitys.IntegralRecord;
+import cn.bdqn.pointsystem.service.IntegralRecordService;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+/**
+ * @author yajun
+ * @create 2019/12/30
+ */
+@Service
+public class IntegralRecordServiceImpl implements IntegralRecordService {
+    @Autowired
+    private IntegralRecordMapper integralRecordMapper;
+
+    @Override
+    public List<IntegralRecord> findIntegralRecordById(Integer UserId,Integer GradeId) {
+        QueryWrapper<IntegralRecord> wrapper = new QueryWrapper<>();
+        if (UserId>0 || UserId!=null){
+            wrapper.eq("user_id",UserId);
+        }else {
+            wrapper.eq("grade_id",GradeId);
+        }
+        return integralRecordMapper.selectList(wrapper);
+    }
+
+}

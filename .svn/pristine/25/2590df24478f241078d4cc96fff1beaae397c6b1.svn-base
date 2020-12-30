@@ -1,0 +1,53 @@
+package cn.bdqn.pointsystem.component;
+
+import cn.bdqn.pointsystem.emtitys.User;
+import cn.bdqn.pointsystem.utlis.Constant;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.ModelAndView;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+/**
+ * 拦截器
+ * @author yajun
+ * @create 2019/12/25
+ */
+@Slf4j
+public class LoginHandlerInterceptor implements HandlerInterceptor {
+
+    //目标方法执行之前
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        User attribute = (User)request.getSession().getAttribute(Constant.CURRENT_USER);
+        if (attribute==null){
+            log.info("请求已拦截"+request.getRequestURL());
+            response.sendRedirect("/");
+            return false;
+        }else {
+            // 获取ServletContext中的sessionId 判断是否一致
+            ServletContext application = request.getServletContext();
+            String sessionId = (String) application.getAttribute(Constant.SESSION_ID);
+            log.info("application SessionId---"+sessionId);
+            //sessionid不正确
+            if (!sessionId.equals(attribute.getSessionId())){
+                log.info("当前用户登陆拦截"+request.getRequestURL());
+                response.sendRedirect("/");
+            }
+            return true;
+        }
+
+    }
+
+    @Override
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
+
+    }
+
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+
+    }
+}

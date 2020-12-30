@@ -1,0 +1,108 @@
+package cn.bdqn.controller;
+
+import cn.bdqn.pointsystem.emtitys.IntegralRecord;
+import cn.bdqn.pointsystem.emtitys.PrizeExchangeRecord;
+import cn.bdqn.pointsystem.service.IntegralRecordService;
+import cn.bdqn.pointsystem.service.PrizeExchangeRecordService;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * @author yajun
+ * @create 2020/1/6
+ */
+@Controller
+public class SysPageController {
+
+    @Autowired
+    private PrizeExchangeRecordService prizeExchangeRecordService;
+
+    @Autowired
+    private IntegralRecordService recordService;
+    /**
+     * 奖品兑换记录分页
+     * @param page 页数
+     * @param limit 每行显示的数据
+     * @param name 用户名
+     * @return
+     */
+    @GetMapping("/pageList")
+    public Map<String,Object> selectPrizeExchangeRecordPage(int page, int limit, @RequestParam(required = false) String name){
+        Map<String,Object> map = new HashMap<>();
+        Page<PrizeExchangeRecord> page1 = new Page<>(page,limit);   //查询第page页，每页返回limit条
+        IPage<PrizeExchangeRecord> iPage = prizeExchangeRecordService.selectPrizeExchangeRecordPage(page1,name);//奖品兑换记录分页
+        int count=prizeExchangeRecordService.getPrizeCount(name);//查询奖品兑换记录总记录数
+        for(PrizeExchangeRecord prizeExchangeRecord :iPage.getRecords()){
+            if("0".equals(prizeExchangeRecord.getIsReceive())){
+                prizeExchangeRecord.setIsReceive("未领取");
+            }else{
+                prizeExchangeRecord.setIsReceive("已领取");
+            }
+        }
+        map.put("code",0);
+        map.put("msg","");
+        map.put("count",count);
+        map.put("data",iPage.getRecords());
+        return map;
+    }
+
+    @RequestMapping("/getIntegralRecordPage")
+    public Object getIntegralRecordPage(@RequestParam(required = false)Integer gradeId,
+                                        @RequestParam(required = false) Integer userId,
+                                        @RequestParam(required = false) String userName,
+                                        @RequestParam(required = false) Integer page,
+                                        @RequestParam(required = false) Integer limit){
+        IntegralRecord integralRecord=new IntegralRecord();
+        integralRecord.setIntegralRecordGradeId(gradeId);
+        integralRecord.setUserId(userId);
+        Page<IntegralRecord> integralRecordPage=new Page<>(page,limit);
+        IPage<IntegralRecord> recordIPage =recordService.selectIntegralRecordStudentPage(integralRecordPage,integralRecord,userName);
+        int count = recordService.selectIntegralRecordStudentPageCount(integralRecord, userName);
+        for (IntegralRecord record :recordIPage.getRecords()){
+            if("0".equals(record.getIsAdd().trim())){
+                record.setIsAdd("减");
+            }if(record.getIsAdd().equals("1")){
+                record.setIsAdd("加");
+            }
+        }
+        Map<String,Object> map=new HashMap<>();
+        map.put("code","0");
+        map.put("msg","");
+        map.put("count",count);
+        map.put("data",recordIPage.getRecords());
+        return map;
+    }
+
+
+    @RequestMapping("/getIntegralRecordGradePage")
+    public Object getIntegralRecordGradePage(@RequestParam(required = false)String gradeName,
+                                             @RequestParam(required = false) Integer page,
+                                             @RequestParam(required = false) Integer limit){
+        IntegralRecord integralRecord=new IntegralRecord();
+        integralRecord.setIntegralRecordGradeName(gradeName);
+        Page<IntegralRecord> integralRecordPage=new Page<>(page,limit);
+        IPage<IntegralRecord> recordIPage =recordService.selectIntegralRecordGradePage(integralRecordPage,integralRecord);
+        int count = recordService.selectIntegralRecordGradePageCount(integralRecord);
+        for (IntegralRecord record :recordIPage.getRecords()){
+            if("0".equals(record.getIsAdd().trim())){
+                record.setIsAdd("减");
+            }if(record.getIsAdd().equals("1")){
+                record.setIsAdd("加");
+            }
+        }
+        Map<String,Object> map=new HashMap<>();
+        map.put("code","0");
+        map.put("msg","");
+        map.put("count",count);
+        map.put("data",recordIPage.getRecords());
+        return map;
+    }
+}

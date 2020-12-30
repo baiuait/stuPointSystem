@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.bdqn.pointsystem.dao.PrizeExchangeRecordMapper">
+    <resultMap id="p" type="cn.bdqn.pointsystem.emtitys.PrizeExchangeRecord">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="prizeId" column="prize_id"/>
+        <result property="creationTime" column="creation_time"/>
+        <result property="isReceive" column="is_receive"/>
+        <result property="qrCode" column="qr_code"/>
+        <association property="user" javaType="cn.bdqn.pointsystem.emtitys.User">
+            <id property="id" column="id"/>
+            <result property="name" column="name"/>
+        </association>
+    </resultMap>
+    <select id="selectPrizeExchangeRecordPage" resultMap="p" >
+      SELECT p.*,u.name
+      FROM prize_exchange_record as p INNER JOIN `user` u
+      ON p.user_id=u.id
+        <where>
+          <if test="name!=null and ''!=name">
+              and u.name like concat('%',#{name},'%')
+          </if>
+      </where>
+    </select>
+    <select id="getPrizeCount" resultType="int" >
+      SELECT count(1)
+      FROM prize_exchange_record as p INNER JOIN `user` u
+      ON p.user_id=u.id
+        <where>
+          <if test="name!=null and ''!=name">
+              and u.name like concat('%',#{name},'%')
+          </if>
+      </where>
+    </select>
+
+
+</mapper>

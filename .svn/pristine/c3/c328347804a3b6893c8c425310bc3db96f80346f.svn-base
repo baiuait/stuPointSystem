@@ -1,0 +1,33 @@
+package cn.bdqn.controller;
+
+import cn.bdqn.pointsystem.emtitys.Grade;
+import cn.bdqn.pointsystem.emtitys.User;
+import cn.bdqn.pointsystem.service.GradeService;
+import cn.bdqn.pointsystem.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.List;
+
+@RequestMapping("/jump")
+@Controller
+public class JumpController {
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private GradeService gradeService;
+
+
+    @RequestMapping("/integralRecord")
+    public String integralRecord(Model model, @RequestParam(required = false) Integer userId,
+                                 @RequestParam(required = false) Integer recorderId){
+        List<User> userList=userService.userList();
+        List<Grade> gradeList = gradeService.getGradeName();
+        model.addAttribute("gradeList",gradeList);
+        model.addAttribute("userList",userList);
+        return "admin/integralRecord";
+    }
+}

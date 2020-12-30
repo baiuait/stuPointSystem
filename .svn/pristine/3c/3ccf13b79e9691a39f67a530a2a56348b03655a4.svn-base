@@ -1,0 +1,66 @@
+package cn.bdqn.pointsystem.service.impl;
+
+import cn.bdqn.pointsystem.dao.CauseMapper;
+import cn.bdqn.pointsystem.dao.IntegralRecordMapper;
+import cn.bdqn.pointsystem.emtitys.Cause;
+import cn.bdqn.pointsystem.emtitys.IntegralRecord;
+import cn.bdqn.pointsystem.service.IntegralRecordService;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+/**
+ * @author yajun
+ * @create 2019/12/30
+ */
+@Service
+public class IntegralRecordServiceImpl implements IntegralRecordService {
+    @Autowired
+    private IntegralRecordMapper integralRecordMapper;
+    @Autowired
+    private CauseMapper causeMapper;
+
+    @Override
+    public List<IntegralRecord> findIntegralRecordCauseByUserId(Integer userId) {
+        QueryWrapper<IntegralRecord> wrapper = new QueryWrapper<>();
+        QueryWrapper<Cause> wrapperCause = new QueryWrapper<>();
+        // 先查询出"兑换奖品"的编号
+        wrapperCause.eq("cause","兑换奖品");
+        Cause cause = causeMapper.selectOne(wrapperCause);
+        wrapper.eq("user_id",userId).eq("cause_id", cause.getId());
+        return  integralRecordMapper.selectList(wrapper);
+    }
+
+    /**
+     * 积分加减记录分页
+     *
+     * @param page
+     * @param integralRecord
+     * @return
+     */
+    @Override
+    public IPage<IntegralRecord> selectIntegralRecordPage(Page<IntegralRecord> page, IntegralRecord integralRecord) {
+        return integralRecordMapper.selectIntegralRecordPage(page,integralRecord);
+    }
+
+    @Override
+    public int insertIntegralRecord(IntegralRecord integralRecord) {
+        return integralRecordMapper.addIntegralRecord(integralRecord);
+    }
+
+    @Override
+    public List<IntegralRecord> findIntegralRecordById(Integer UserId,Integer GradeId) {
+        QueryWrapper<IntegralRecord> wrapper = new QueryWrapper<>();
+        if (UserId>0 || UserId!=null){
+            wrapper.eq("user_id",UserId);
+        }else {
+            wrapper.eq("grade_id",GradeId);
+        }
+        return integralRecordMapper.selectList(wrapper);
+    }
+
+}

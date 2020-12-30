@@ -1,0 +1,82 @@
+package cn.bdqn.controller;
+
+import cn.bdqn.pointsystem.emtitys.Grade;
+import cn.bdqn.pointsystem.emtitys.IntegralRecord;
+import cn.bdqn.pointsystem.emtitys.User;
+import cn.bdqn.pointsystem.service.GradeService;
+import cn.bdqn.pointsystem.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.List;
+
+/**
+ * 跳转controller
+ */
+@RequestMapping("/jump")
+@Controller
+public class JumpController {
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private GradeService gradeService;
+
+
+    @RequestMapping("/integralRecord")
+    public String integralRecord(Model model, @RequestParam(required = false) Integer userId,
+                                 @RequestParam(required = false) Integer recorderId){
+        List<User> userList=userService.userList();
+        List<Grade> gradeList = gradeService.getGradeName();
+        model.addAttribute("gradeList",gradeList);
+        model.addAttribute("userList",userList);
+        return "admin/integralRecord";
+    }
+
+    @RequestMapping("/prizeInfo")
+    public String prizeInfo(){
+        return "admin/prize";
+    }
+
+
+    @RequestMapping("/prizeExchangRecord")
+    public String prizeEx(){
+        return "admin/prizeExchangRecord";
+    }
+
+    @RequestMapping("/user")
+    public String userInfo(Model model){
+        List<Grade> gradeList = gradeService.getGradesOrderByPoint();//查询班级表
+        model.addAttribute("gradeList",gradeList);
+        return "admin/user";
+    }
+
+    @RequestMapping("/addCause")
+    public String addCause(){
+        return "admin/enNe";
+    }
+
+    @RequestMapping("/registerUser")
+    public String registerUser(){
+        return "/registerUser";
+    }
+    @RequestMapping("/addStudent")
+    public String addStudent(){
+        return "/addStudent";
+    }
+
+    @RequestMapping("/loginTeacher")
+    public String loginTeacher(){
+        return "/loginTeacher";
+    }
+
+
+    @RequestMapping("/integralGradeRecord")
+    public String integralGradeRecord(Model model){
+        List<Grade> gradeList = gradeService.getGradeName();
+        model.addAttribute("gradeList",gradeList);
+        return "admin/integralGradeRecord";
+    }
+}

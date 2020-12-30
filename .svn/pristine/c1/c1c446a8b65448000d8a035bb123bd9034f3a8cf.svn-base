@@ -1,0 +1,17 @@
+package cn.bdqn.pointsystem.service;
+
+import cn.bdqn.pointsystem.emtitys.Grade;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+/**
+ * @Classname GradeService
+ * @Description TODO
+ * @Date 2019/12/27 18:26
+ * @Created by wxz
+ */
+public interface GradeService {
+//    public PageInfo<Grade> getGradeList(Integer pageStart, Integer pageSize, Grade grade);
+public List<Grade> getGradeList(Grade grade);
+}

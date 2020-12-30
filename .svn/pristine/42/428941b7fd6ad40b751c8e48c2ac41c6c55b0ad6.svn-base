@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>积分加减记录信息</title>
+    <link rel="stylesheet" href="../../static/layui/css/layui.css" media="all">
+</head>
+<body>
+<form class="layui-form" >
+    <input class="userName" type="text">
+    <input type="button" class="buttonName" value="搜索" onclick="clickUserName();"/>
+    <select id="gradeInfo"  lay-filter="testId" >
+        <option value="0">请选择</option>
+    <#list gradeList as grade>
+        <option value="${grade.id}">${grade.name}</option>
+    </#list>
+    </select>
+    <select id="userInfo"  lay-filter="userId" >
+        <option value="0">请选择</option>
+    <#list userList as user>
+        <option value="${user.id}">${user.name}</option>
+    </#list>
+    </select>
+</form>
+
+<table id="demo" lay-filter="test">
+
+</table>
+<script src="../../static/js/const/jquery-3.3.1.js"></script>
+<script src="../../static/layui/layui.js"></script>
+<script>
+    loadData(null);
+    // var arr=[];
+    var userName;
+    var testId;
+    var userId;
+    function clickUserName(){
+        userName=$(".userName").val();
+        loadData();
+    }
+    layui.use(['form'], function () {
+        var form = layui.form;
+        form.on('select(testId)', function(data){
+            if(data.value>0){
+                testId=data.value;
+                loadData();
+            } if(data.value==0) {
+                testId=null;
+                loadData();
+            }
+        });
+    });
+    layui.use(['form'], function () {
+        var form = layui.form;
+        form.on('select(userId)', function(data){
+            if(data.value>0){
+                userId=data.value;
+                loadData();
+            } if(data.value==0) {
+                userId=null;
+                loadData();
+            }
+        });
+    });
+    function loadData(){
+        layui.use('table', function(){
+            var table = layui.table;
+            //第一个实例
+            table.render({
+                elem: '#demo'
+                ,height: 312
+                ,url: '/point/getIntegralRecordPage' //数据接口
+                ,page: true
+                ,cols: [[ //表头
+                    {field: 'id', title: 'ID', width:80, sort: true, fixed: 'left'}
+                    ,{field: 'name', title: '用户名', width:120,templet: '<div>{{d.user.name}}</div>'}
+                    ,{field: 'gradeName', title: '班级名', width:120,templet: '<div>{{d.grade.name}}</div>'}
+                    ,{field: 'point', title: '加减的分数', width:80, sort: true}
+                    ,{field: 'isAdd', title: '是加是减(1:加 0:减)', width:80}
+                    ,{field: 'cause', title: '加减记录的原因', width: 177,templet: '<div>{{d.cause.cause}}</div>'}
+                    ,{field: 'recorderName', title: '记录者姓名', width: 180}
+                    ,{field: 'creationTime', title: '时间', width: 180, sort: true}
+                ]]
+                ,where: {
+                    // //.渲染请求参数(查询条件等)
+                    gradeId: testId,
+                    userName: userName,
+                    userId:userId
+                }
+            });
+        });
+    }
+</script>
+</body>
+</html>

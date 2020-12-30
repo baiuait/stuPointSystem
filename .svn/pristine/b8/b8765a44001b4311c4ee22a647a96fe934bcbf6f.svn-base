@@ -1,0 +1,34 @@
+package cn.bdqn.pointsystem.service.impl;
+
+import cn.bdqn.pointsystem.dao.GradeMapper;
+import cn.bdqn.pointsystem.emtitys.Grade;
+import cn.bdqn.pointsystem.service.GradeService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+/**
+ * @Classname GradeServiceImpl
+ * @Description TODO
+ * @Date 2019/12/27 18:27
+ * @Created by Administrator
+ */
+
+@Service
+public class GradeServiceImpl implements GradeService {
+
+    @Autowired
+    public GradeMapper gradeMapper;
+
+    @Override
+    public List<Grade> getGradeList(Grade grade) {
+        return gradeMapper.getGradeList(grade);
+    }
+
+//    @Override
+//    public PageInfo<Grade> getGradeList(Integer pageStart, Integer pageSize, Grade grade) {
+////        PageHelper.startPage(pageStart,pageSize);
+//        return new PageInfo<Grade>(gradeMapper.getGradeList(grade));
+//    }
+}

@@ -1,0 +1,49 @@
+package cn.bdqn.controller;
+
+import cn.bdqn.pointsystem.emtitys.Prize;
+import cn.bdqn.pointsystem.emtitys.User;
+import cn.bdqn.pointsystem.service.PrizeExchangeRecordService;
+import cn.bdqn.pointsystem.service.PrizeService;
+import cn.bdqn.pointsystem.service.UserService;
+import cn.bdqn.pointsystem.utlis.Constant;
+import cn.bdqn.pointsystem.utlis.ReturnResult;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpSession;
+import java.util.Map;
+
+/**
+ * @author yajun
+ * @create 2019/12/31
+ */
+@RestController
+@RequestMapping("/prizeExchangeRecord")
+public class PrizeExchangeRecordController {
+
+    @Autowired
+    private PrizeExchangeRecordService prizeExchangeRecordService;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private PrizeService prizeService;
+
+    @PostMapping("/addPrizeExchangeRecord")
+    public Map<String, Object> add(@RequestParam Integer prizeId, HttpSession session) throws Exception {
+        User user = ((User) session.getAttribute((Constant.CURRENT_USER)));
+        // 查询商品数量 --> 防止多人同时操作造成商品负数
+        Prize prize = prizeService.selectPrizeOne(prizeId);
+        if (prize.getNumber() <= 0){
+            return ReturnResult.returnFail(null, null, 505);
+        }
+        // 执行添加交易信息的各类数据
+        boolean flag = prizeExchangeRecordService.exchangePrizes(user.getId(), prizeId, prize.getPoint());
+        if(flag){
+            // 执行成功，重新查询user并存入session
+            User userTemp = userService.findUserByidentity(user.getIdentity());
+            session.setAttribute(Constant.CURRENT_USER, userTemp);
+            return ReturnResult.returnSuccess(null, null);
+        }
+        return ReturnResult.returnFail(null, null, 500);
+    }
+}

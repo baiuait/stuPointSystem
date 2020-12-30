@@ -1,0 +1,29 @@
+package cn.bdqn.pointsystem.emtitys;
+/**
+ * 积分增减详情表
+ */
+
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.Date;
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class IntegralRecord {
+
+  @TableId(type = IdType.AUTO)
+  private Integer id;
+  private Integer userId;//用户id
+  private Integer gradeId;//班级id
+  private Integer point;//加减的分数
+  private Integer isAdd;//1加，0减
+  private Integer causeId;//详情id
+  private Integer recorderId;//记录者id
+  private Date creationTime;//记录时间
+  private Grade grade;//班级
+  private User user;//用户
+}

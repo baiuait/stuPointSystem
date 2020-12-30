@@ -1,0 +1,40 @@
+package cn.bdqn.pointsystem.service.impl;
+
+import cn.bdqn.pointsystem.dao.UserMapper;
+import cn.bdqn.pointsystem.emtitys.User;
+import cn.bdqn.pointsystem.service.UserService;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+/**
+ * @author yajun
+ * @create 2019/12/27
+ */
+@Service
+public class UserServiceImpl implements UserService {
+
+    @Autowired
+    private UserMapper userMapper;
+
+    @Override
+    public User findUserByidentity(String identity) {
+        QueryWrapper<User> wrapper = new QueryWrapper<>();
+        wrapper.eq("identity",identity);
+        return userMapper.selectOne(wrapper);
+    }
+
+    @Override
+    public User login(String identity, String username) {
+        QueryWrapper<User> wrapper = new QueryWrapper<>();
+        wrapper.eq("identity",identity).eq("name",username);
+        return userMapper.selectOne(wrapper);
+    }
+
+    @Override
+    public List<User> userList() {
+        return userMapper.selectList(null);
+    }
+}

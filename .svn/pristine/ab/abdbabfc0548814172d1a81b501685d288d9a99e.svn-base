@@ -1,0 +1,54 @@
+package cn.bdqn.pointsystem.service;
+
+import cn.bdqn.pointsystem.emtitys.IntegralRecord;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+
+
+import java.util.List;
+
+/**
+ * @author yajun
+ * @create 2019/12/30
+ */
+public interface IntegralRecordService {
+
+    /**
+     * 根据用户或班级的id查询增加减去的积分详情
+     * @param UserId 用户id
+     * @param GradeId 班级id
+     * @return
+     */
+    List<IntegralRecord> findIntegralRecordById(Integer UserId,Integer GradeId);
+
+    /**
+     * 根据用户id查询所有原因为兑换奖品的记录
+     * 1111为奖品编号
+     * @param userId
+     * @return
+     */
+    List<IntegralRecord> findIntegralRecordCauseByUserId(Integer userId);
+
+
+    /**
+     * 积分加减记录分页
+     * @param page
+     * @return
+     */
+    IPage<IntegralRecord> selectIntegralRecordPage(Page<IntegralRecord> page, IntegralRecord integralRecord,String name);
+
+    /**
+     * 新增记录
+     * @param integralRecord
+     * @return
+     */
+    int insertIntegralRecord(IntegralRecord integralRecord);
+
+    /**
+     * 查询积分加减记录总记录数
+     * @param integralRecord
+     * @param userName 用户名
+     * @return
+     */
+    int getIntegralRecordCount(IntegralRecord integralRecord,String userName);
+}

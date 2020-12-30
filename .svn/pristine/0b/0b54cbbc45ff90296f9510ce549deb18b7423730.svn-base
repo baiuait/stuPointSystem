@@ -1,0 +1,48 @@
+package cn.bdqn.pointsystem.service;
+
+import cn.bdqn.pointsystem.emtitys.Prize;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.ibatis.annotations.Param;
+
+
+import java.util.List;
+
+/**
+ * @Classname PrizeService
+ * @Description 奖品
+ * @Date 2019/12/30 10:49
+ * @Created by lenovo
+ */
+
+public interface PrizeService{
+
+    /**
+     * 奖品查询
+     * @return
+     */
+    List<Prize> SelectPrize();
+
+    /**
+     * 根据ID删除奖品
+     * @param id
+     * @return
+     */
+    int DeletePrize(int id);
+
+    /**
+     * 添加奖品
+     * @param prize
+     * @return
+     */
+    int InsertPrize(Prize prize);
+
+    /**
+     * 修改商品
+     * @param prize
+     * @return
+     */
+    int UpdatePrize(Prize prize);
+
+    Prize SelectPrizeOne(int id);
+}

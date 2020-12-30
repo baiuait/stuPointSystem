@@ -1,0 +1,42 @@
+package cn.bdqn.pointsystem.dao;
+
+import cn.bdqn.pointsystem.emtitys.User;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+
+/**
+ * @author yajun
+ * @create 2019/12/27
+ */
+@Component
+@Mapper
+public interface UserMapper extends BaseMapper<User> {
+    List<User> Listuser();
+
+    /**
+     * 查询用户总记录数
+     * @return
+     */
+    int getCount(@Param("gradeId") Integer gradeId,
+                 @Param("isAdmin")  Integer isAdmin,@Param("name")  String name);
+
+
+    /**
+     * 用户分页
+     * @param page
+     * 用户表的班级编号 @param  gradeId
+     * 用户表的是否为管理员 @param isAdmin
+     * 用户表的姓名 @param name
+     * @return
+     */
+    IPage<User>  selectPageUser(Page page, @Param("gradeId") Integer gradeId,
+                                @Param("isAdmin")  Integer isAdmin,@Param("name")  String name);
+
+    Integer updateUserPoint(@Param("point") Integer point,@Param("id")Integer id);
+}

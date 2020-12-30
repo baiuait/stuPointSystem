@@ -1,0 +1,70 @@
+package cn.bdqn.pointsystem.service.impl;
+
+import cn.bdqn.pointsystem.dao.IntegralRecordMapper;
+import cn.bdqn.pointsystem.dao.PrizeExchangeRecordMapper;
+import cn.bdqn.pointsystem.dao.PrizeMapper;
+import cn.bdqn.pointsystem.dao.UserMapper;
+import cn.bdqn.pointsystem.emtitys.IntegralRecord;
+import cn.bdqn.pointsystem.emtitys.PrizeExchangeRecord;
+import cn.bdqn.pointsystem.service.PrizeExchangeRecordService;
+import cn.bdqn.pointsystem.utlis.RandomUtlis;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+/**
+ * @author yajun
+ * @create 2019/12/31
+ */
+@Service
+public class PrizeExchangeRecordServiceImpl implements PrizeExchangeRecordService {
+    //奖品兑换记录数据层
+    @Autowired
+    private PrizeExchangeRecordMapper exchangeRecordMapper;
+    //奖品数据层
+    @Autowired
+    private PrizeMapper prizeMapper;
+    //用户数据层
+    @Autowired
+    private UserMapper userMapper;
+    @Autowired
+    private IntegralRecordMapper integralRecordMapper;
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean exchangePrizes(Integer userId, Integer prizeId, Integer point) throws Exception {
+        Integer result = 0;
+        //1.添加一条兑换记录
+        PrizeExchangeRecord prizeExchangeRecord = new PrizeExchangeRecord();
+        prizeExchangeRecord.setUserId(userId);
+        prizeExchangeRecord.setPrizeId(prizeId);
+        prizeExchangeRecord.setQrCode(RandomUtlis.getRandomString2(16));
+        result = exchangeRecordMapper.insert(prizeExchangeRecord);
+        if (result == 0) throw new Exception("添加兑换奖品记录异常");
+        //2.减去兑换的奖品数量 -1
+        result = prizeMapper.updatePrizeNumber(prizeId);
+        if (result == 0) throw new Exception("修改商品数量异常");
+        //3.修改学生积分
+        result = userMapper.updateUserPoint(point, userId);
+        if (result == 0) throw new Exception("修改学生积分异常");
+        //4.添加一条积分加减记录
+        IntegralRecord record = new IntegralRecord();
+        record.setUserId(userId);
+        record.setIsAdd(0);
+        record.setPoint(point);
+        record.setRecorderId(userId);
+        record.setCauseId(1111);
+        result = integralRecordMapper.insert(record);
+        if (result == 0) throw new Exception("添加积分加减记录异常");
+        return true;
+    }
+
+    public List<PrizeExchangeRecord> getPrizeExchangeRecordByUserId(Integer userId){
+        QueryWrapper<PrizeExchangeRecord> wrapper = new QueryWrapper<>();
+        wrapper.eq("user_id",userId);
+        return  exchangeRecordMapper.selectList(wrapper);
+    }
+}

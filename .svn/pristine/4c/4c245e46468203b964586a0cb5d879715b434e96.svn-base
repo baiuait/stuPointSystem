@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.bdqn.pointsystem.dao.IntegralRecordMapper">
+    <resultMap id="IntegralRecordResult" type="cn.bdqn.pointsystem.emtitys.IntegralRecord">
+        <id property="id" column="id"/>
+        <result column="user_id" property="userId"/>
+        <result column="grade_id" property="gradeId"/>
+        <result column="point" property="point"/>
+        <result column="is_add" property="isAdd"/>
+        <result column="cause_id" property="causeId"/>
+        <result column="recorder_id" property="recorderId"/>
+        <result column="creation_time" property="creationTime"/>
+        <result column="recorderName" property="recorderName"/>
+        <association property="grade" javaType="cn.bdqn.pointsystem.emtitys.Grade">
+            <id column="gId" property="id"/>
+            <result column="gradeName" property="name"/>
+            <result column="point" property="point"/>
+        </association>
+        <association property="user" javaType="cn.bdqn.pointsystem.emtitys.User">
+            <id column="uId" property="id"/>
+            <result column="name" property="name"/>
+        </association>
+        <association property="cause" javaType="cn.bdqn.pointsystem.emtitys.Cause">
+            <id column="cId" property="id"/>
+            <result column="cause" property="cause"/>
+        </association>
+    </resultMap>
+
+    <select id="getIntegralRecordCount" resultType="int" parameterType="cn.bdqn.pointsystem.emtitys.IntegralRecord">
+        SELECT  count(1)
+        FROM integral_record i
+        LEFT JOIN grade g ON g.id=i.`grade_id`
+        LEFT JOIN USER u ON u.id=i.`user_id`
+        INNER JOIN cause c ON c.`id`=i.`cause_id`
+        <where>
+            <if test="integralRecord.userId != null and ''!=integralRecord.userId">
+                and u.id=#{integralRecord.userId} and  i.`grade_id` IS NULL
+            </if>
+            <if test="integralRecord.gradeId != null and ''!=integralRecord.gradeId">
+                and g.id=#{integralRecord.gradeId} and i.`user_id` IS NULL
+            </if>
+            <if test="userName !=null and ''!=userName">
+                and u.name like concat('%',#{userName},'%')
+            </if>
+        </where>
+    </select>
+
+    <select id="selectIntegralRecordPage" resultMap="IntegralRecordResult" parameterType="cn.bdqn.pointsystem.emtitys.IntegralRecord">
+        SELECT i.*,u.name ,g.`name` AS gradeName,g.id AS gId,u.id AS uId,c.id AS cId,c.`cause`,
+        (SELECT u.`name` FROM USER u WHERE u.id=i.`recorder_id`) AS recorderName
+
+         FROM integral_record i
+        LEFT JOIN grade g ON g.id=i.`grade_id`
+        LEFT JOIN USER u ON u.id=i.`user_id`
+        INNER JOIN cause c ON c.`id`=i.`cause_id`
+        <where>
+            <if test="integralRecord.userId != null and ''!=integralRecord.userId">
+                and u.id=#{integralRecord.userId} and  i.`grade_id` IS NULL
+            </if>
+            <if test="integralRecord.gradeId != null and ''!=integralRecord.gradeId">
+                and g.id=#{integralRecord.gradeId} and i.`user_id` IS NULL
+            </if>
+            <if test="userName !=null and ''!=userName">
+                and u.name like concat('%',#{userName},'%')
+            </if>
+
+        </where>
+        ORDER BY i.id  DESC
+    </select>
+
+    <insert id="addGradeIntegralRecord">
+        INSERT INTO integral_record(grade_id,POINT,is_add,cause_id,recorder_id,creation_time) VALUES(#{gradeId},#{point},#{isAdd},#{causeId},#{recorderId},#{creationTime})
+    </insert>
+    <insert id="addUserIntegralRecord">
+        INSERT INTO integral_record(user_id,POINT,is_add,cause_id,recorder_id,creation_time) VALUES(#{userId},#{point},#{isAdd},#{causeId},#{recorderId},#{creationTime})
+    </insert>
+
+</mapper>

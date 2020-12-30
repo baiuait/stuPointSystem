@@ -1,0 +1,31 @@
+package cn.bdqn.pointsystem.emtitys;
+
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.util.Date;
+
+/**
+ * 奖品兑换记录表
+ */
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class PrizeExchangeRecord {
+
+  @TableId(type = IdType.AUTO)
+  private Integer id;//积分编号
+  private Integer userId;//用户id
+  private Integer prizeId;//积分id
+  @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+  private Date creationTime;//兑换时间
+  private Integer isReceive;//0未领取1已领取
+  private String qrCode;//奖品二维码
+  private User user;//用户表
+
+}

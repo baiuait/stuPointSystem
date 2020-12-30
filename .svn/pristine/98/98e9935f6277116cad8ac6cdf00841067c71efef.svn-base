@@ -1,0 +1,13 @@
+package cn.bdqn.pointsystem.dao;
+
+import cn.bdqn.pointsystem.emtitys.PrizeExchangeRecord;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Mapper;
+
+/**
+ * @author yajun
+ * @create 2019/12/31
+ */
+@Mapper
+public interface PrizeExchangeRecordMapper extends BaseMapper<PrizeExchangeRecord> {
+}

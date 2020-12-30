@@ -1,0 +1,74 @@
+package cn.bdqn.controller;
+
+import cn.bdqn.pointsystem.emtitys.Prize;
+import cn.bdqn.pointsystem.service.PrizeService;
+import cn.bdqn.pointsystem.utlis.ReturnResult;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.ibatis.annotations.Param;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
+import java.util.List;
+import java.util.Map;
+
+/**
+ * @Classname PrizeController
+ * @Description 奖品
+ * @Date 2019/12/30 10:36
+ * @Created by zhangshilong
+ */
+@Controller
+@RequestMapping("/prize")
+@ResponseBody
+public class PrizeController {
+
+    @Autowired
+    private PrizeService prizeService;
+    @RequestMapping(value = "/hello", method = RequestMethod.GET)
+    public String ho(){
+        return "prize";
+    }
+    @GetMapping("/list")
+    public List<Prize> list(){ return prizeService.SelectPrize(); }
+
+    @GetMapping("/delete")
+    public int deltePrize(int id){
+        return prizeService.DeletePrize(id);
+    }
+
+    @GetMapping("/insert")
+    public int insertPrinze(Prize prize){
+        return prizeService.InsertPrize(prize);
+    }
+
+    @GetMapping("/selectone")
+    public  Prize SelectOne(int id){ return  prizeService.SelectPrizeOne(id); }
+
+
+    /**
+     * 查询全部奖品
+     * @return
+     * @作者 yajun
+     */
+    @GetMapping("/getPrizeList")
+    public Map<String,Object> getPrizeList(){
+        Map<String,Object> map = null;
+        List<Prize> prizes = prizeService.SelectPrize();
+        if (null == prizes){
+            ReturnResult.returnFail("","",500);
+        }else {
+
+            ReturnResult.returnSuccess("",prizes);
+        }
+        return map;
+    }
+
+
+
+}

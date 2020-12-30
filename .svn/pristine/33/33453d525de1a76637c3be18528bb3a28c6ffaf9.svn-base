@@ -1,0 +1,126 @@
+package cn.bdqn.controller;
+
+import cn.bdqn.pointsystem.emtitys.Prize;
+import cn.bdqn.pointsystem.emtitys.User;
+import cn.bdqn.pointsystem.service.PrizeService;
+import cn.bdqn.pointsystem.utlis.ReturnResult;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.ibatis.annotations.Param;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * @Classname PrizeController
+ * @Description 奖品
+ * @Date 2019/12/30 10:36
+ * @Created by zhangshilong
+ */
+@Controller
+@RequestMapping("/prize")
+public class PrizeController {
+
+    @Autowired
+    private PrizeService prizeService;
+    @ResponseBody
+    @RequestMapping(value = "/hello", method = RequestMethod.GET)
+    public String ho(){
+        return "prize";
+    }
+    @ResponseBody
+    @GetMapping("/list")
+    public List<Prize> list(){ return prizeService.selectPrize(); }
+    @ResponseBody
+    @GetMapping("/insert")
+    public boolean insertPrinze(Prize prize){
+        return prizeService.insertPrize(prize);
+    }
+    @ResponseBody
+    @GetMapping("/selectone")
+    public  Prize selectOne(int id){ return  prizeService.selectPrizeOne(id); }
+
+
+    @ResponseBody
+    @GetMapping("/getPrizePage")
+    public  Object getPrizePage(@RequestParam(required = false) Integer page,
+                                @RequestParam(required = false) Integer limit,
+                                @RequestParam(required = false) String name){
+        Page<Prize> ipage=new Page<>(page,limit);//分页实体类  (当前页,每页显示几条信息)
+        IPage<Prize> prizeIPage = prizeService.selectPagePrize(ipage, name);//分页
+        int count=prizeService.prizeCount(name);//查询商品总记录数
+        Map<Object,Object> map=new HashMap<>();
+        map.put("data",prizeIPage.getRecords());//返回的集合数据
+        map.put("code","0");
+        map.put("count",count);
+        map.put("msg","");
+        return map;
+    }
+
+    @GetMapping("/getByIdPrize")
+    public String getByIdPrize(int prizeId, Model model){
+        Prize prize = prizeService.selectPrizeOne(prizeId);
+        model.addAttribute("prize",prize);
+        return "admin/getByIdPrize";
+    }
+    @GetMapping("/updatePrize")
+    @ResponseBody
+    public Object updatePrize(Prize prize, Model model){
+        boolean flag = prizeService.updatePrize(prize);
+        Map<Object,Object> map=new HashMap<>();
+        map.put("flag",flag);
+        return map;
+    }
+
+
+    /**
+     * 查询全部奖品
+     * @return
+     * @作者 yajun
+     */
+    @ResponseBody
+    @GetMapping("/getPrizeList")
+    public Map<String,Object> getPrizeList(){
+        Map<String,Object> map = null;
+        try{
+            List<Prize> prizes = prizeService.selectPrize();
+            map = ReturnResult.returnSuccess("",prizes);
+        }catch(Exception e){
+            map = ReturnResult.returnFail("","",500);
+        }
+        return map;
+    }
+
+    /**
+     * 根据奖品id获取奖品对象
+     * ReturnResult.returnFail("","",500)查询异常
+     * ReturnResult.returnFail("","",505);奖品数量为空
+     * ReturnResult.returnSuccess("",prize);查询成功返回
+     * @param prizeId 奖品id
+     * @return
+     */
+    @ResponseBody
+    @GetMapping("/getPrizeById")
+    public Map<String,Object> getPrizeById(@RequestParam Integer prizeId){
+        Map<String,Object> map = null;
+        Prize prize = prizeService.selectPrizeOne(prizeId);
+        if (null==prize){
+            map = ReturnResult.returnFail("","",500);
+        }else {
+            if (prize.getNumber()==0){
+                map = ReturnResult.returnFail("","",505);
+            }else {
+                map = ReturnResult.returnSuccess("",prize);
+            }
+        }
+        return map;
+    }
+
+
+}

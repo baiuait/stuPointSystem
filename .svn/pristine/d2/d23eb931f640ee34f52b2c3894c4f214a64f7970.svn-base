@@ -1,0 +1,77 @@
+package cn.bdqn.pointsystem.service.impl;
+
+import cn.bdqn.pointsystem.dao.PrizeMapper;
+import cn.bdqn.pointsystem.emtitys.Prize;
+import cn.bdqn.pointsystem.service.PrizeService;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+/**
+ * @Classname PirzeServiceImpl
+ * @Description 奖品
+ * @Date 2019/12/30 10:51
+ * @Created by lenovo
+ */
+@Service
+public class PirzeServiceImpl implements PrizeService {
+
+    @Autowired
+    PrizeMapper prizemapper;
+
+
+    /**
+     * 查询奖品
+     * @return
+     */
+    @Override
+    public List<Prize> SelectPrize() {
+
+        return prizemapper.SelectPrize();
+    }
+
+    /**
+     * 根据ID删除奖品
+     * @param id
+     * @return
+     */
+    @Override
+    public int DeletePrize(int id) {
+        return prizemapper.DeletePrize(id);
+    }
+
+    /**
+     * 添加奖品
+     * @param prize
+     * @return
+     */
+    @Override
+    public int InsertPrize(Prize prize) {
+        return prizemapper.InsertPrize(prize);
+    }
+
+    /**
+     * 更新商品
+     * @param prize
+     * @return
+     */
+    @Override
+    public int UpdatePrize(Prize prize) {
+        return prizemapper.UpdatePrize(prize);
+    }
+
+    /**
+     * 查询单个商品
+     * @param id
+     * @return
+     */
+    @Override
+    public Prize SelectPrizeOne(int id) {
+        return prizemapper.SelectPrizeOne(id);
+    }
+
+
+}

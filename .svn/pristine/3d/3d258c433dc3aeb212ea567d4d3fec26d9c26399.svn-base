@@ -1,0 +1,66 @@
+package cn.bdqn.pointsystem.service.impl;
+
+import cn.bdqn.pointsystem.dao.UserMapper;
+import cn.bdqn.pointsystem.emtitys.User;
+import cn.bdqn.pointsystem.service.UserService;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+/**
+ * @author yajun
+ * @create 2019/12/27
+ */
+@Service
+public class UserServiceImpl implements UserService {
+
+    @Autowired
+    private UserMapper userMapper;
+
+    @Override
+    public User findUserByidentity(String identity) {
+        QueryWrapper<User> wrapper = new QueryWrapper<>();
+        wrapper.eq("identity",identity);
+        return userMapper.selectOne(wrapper);
+    }
+
+    /**
+     * 查询用户总记录数
+     *
+     * @return
+     */
+    @Override
+    public int count() {
+        return userMapper.getCount();
+    }
+
+    /**
+     * 用户分页
+     *
+     * @param page
+     * @param gradeId  用户表的班级编号
+     * @param isAdmin  用户表的是否为管理员
+     * @param name  用户表的姓名
+     * @return
+     */
+    @Override
+    public IPage<User> getPageUser(Page page, Integer gradeId, Integer isAdmin, String name) {
+        return userMapper.selectPageUser(page,gradeId,isAdmin,name);
+    }
+
+    @Override
+    public User login(String identity, String username) {
+        QueryWrapper<User> wrapper = new QueryWrapper<>();
+        wrapper.eq("identity",identity).eq("name",username);
+        return userMapper.selectOne(wrapper);
+    }
+
+    @Override
+    public List<User> userList() {
+        return userMapper.Listuser();
+    }
+}

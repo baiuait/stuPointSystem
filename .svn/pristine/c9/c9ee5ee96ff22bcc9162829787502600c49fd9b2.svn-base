@@ -1,0 +1,33 @@
+package cn.bdqn.pointsystem.service;
+
+import cn.bdqn.pointsystem.emtitys.User;
+
+import java.util.List;
+
+/**
+ * @author yajun
+ * @create 2019/12/27
+ */
+public interface UserService {
+
+
+    /**
+     * 登陆方法
+     * @param identity
+     * @param username
+     * @return
+     */
+    User login(String identity,String username);
+    /**
+     * 查询所有学生
+     * @return
+     */
+    List<User> userList();
+
+    /**
+     * 根据身份证查询用户
+     * @param identity 身份证号
+     * @return
+     */
+    User findUserByidentity(String identity);
+}

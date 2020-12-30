@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="pointsystem-controller:war">
+    <output-path>$PROJECT_DIR$/pointsystem-controller/target</output-path>
+    <properties id="maven-jee-properties">
+      <options>
+        <module>pointsystem-controller</module>
+        <packaging>war</packaging>
+      </options>
+    </properties>
+    <root id="archive" name="pointsystem-controller-0.0.1-SNAPSHOT.war">
+      <element id="artifact" artifact-name="pointsystem-controller:war exploded" />
+    </root>
+  </artifact>
+</component>

@@ -1,0 +1,46 @@
+package cn.bdqn.pointsystem.dao;
+
+import cn.bdqn.pointsystem.emtitys.IntegralRecord;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+/**
+ * @author yajun
+ * @create 2019/12/30
+ */
+@Mapper
+public interface IntegralRecordMapper extends BaseMapper<IntegralRecord> {
+
+    /**
+     * 积分加减记录分页
+     * @param page
+     * @return
+     */
+    IPage<IntegralRecord> selectIntegralRecordPage( Page<IntegralRecord> page,@Param("integralRecord") IntegralRecord integralRecord,@Param("userName") String userName);
+
+
+    /**
+     * 查询积分加减记录总记录数
+     * @param integralRecord
+     * @param userName 用户名
+     * @return
+     */
+    int getIntegralRecordCount(@Param("integralRecord") IntegralRecord integralRecord,@Param("userName") String userName);
+
+    /**
+     * 添加记录
+     * @param integralRecord
+     * @return
+     */
+    int addIntegralRecord(IntegralRecord integralRecord);
+
+    /**
+     * 积分加减记录分页
+     * @param page
+     * @return
+     */
+    IPage<IntegralRecord> selectIntegralRecordPageTwo( Page<IntegralRecord> page,@Param("integralRecord") IntegralRecord integralRecord);
+}

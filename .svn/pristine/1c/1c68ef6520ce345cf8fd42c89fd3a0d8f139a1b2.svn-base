@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>用户信息</title>
+    <link rel="stylesheet" href="/static/layui/css/layui.css" media="all">
+</head>
+
+<form class="layui-form" >
+    <input type="text" placeholder="商品名" class="prizeName"/>
+    <input type="button" class="buttonName" value="搜索" onclick="clickPrizeName();"/>
+</form>
+
+<div id="lalla" class="layui-col-md6 layui-col-md-offset3">
+    <img src="">
+</div>
+    <table style="clear: both" id="demo" lay-filter="test" >
+
+    </table>
+
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-xs upd" id="upd"  lay-filter="testId" lay-event="edit">编辑</a>
+    <!--<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">下架</a>-->
+</script>
+
+<script src="/static/layui/layui.js"></script>
+<script src="/static/js/const/jquery-3.3.1.js"></script>
+<script>
+
+    $("#upd").click(function () {
+        var checkStatus = table.checkStatus('demo'), data2 = checkStatus.data;
+        $.getJSON("/prize/getPrizeById?prizeId" + data2[0].id, function (data1) {
+            //信息
+            alert(data1.data.get(0).name)
+            //     layer.open({
+            //         type: 1,
+            //         skin: 'layui-layer-rim', //加上边框
+            //         area: ['350px', '500px'], //宽高
+            //         content: '<form class="layui-form form" style="margin-left: 100px" id="form" enctype="multipart/form-data" >  <div class="layui-form-item">\n' +
+            //             '    <label class="layui-form-label">商品名</label>\n' +
+            //             '    <div class="layui-input-inline">\n' +
+            //             '      <input type="text" name="name" id="name" value="'+data1["data"].name+'"  placeholder="请输入商品名" required lay-verify="required"  class="layui-input">\n' +
+            //             '    </div>\n' +
+            //             '    <label class="layui-form-label">兑换所需积分</label>\n' +
+            //             '    <div class="layui-input-inline">\n' +
+            //             '      <input type="number" name="point" id="point" value="'+data1[data].point+'" placeholder="兑换所需积分" required lay-verify="required"  class="layui-input">\n' +
+            //             '    </div>\n' +
+            //             '    <label class="layui-form-label">奖品数量</label>\n' +
+            //             '    <div class="layui-input-inline">\n' +
+            //             '      <input type="number" name="number" id="number" value="'+data1[data].number+'"  placeholder="请输入奖品数量" required lay-verify="required"  class="layui-input">\n' +
+            //             '    </div>\n' +
+            //             '    <label class="layui-form-label">奖品配图</label>\n' +
+            //             '    <img class="layui-upload-img" id="demo1" src="'+data1[data].imgUrl+'">'+
+            //             '    <div class="layui-input-inline">\n' +
+            //             '      <input type="file" name="img_url" id="img_url" required lay-verify="required"  class="layui-input">\n' +
+            //             '    </div>\n' +
+            //             ' <div class="layui-input-inline"><input type="button" value="修改" class="layui-btn layui-btn-primary" style="margin: 50px" id="submit"></div> </div>' +
+            //             '</form>'
+            //     });
+        });
+    });
+
+
+    $(document).on("click",".upd",function(){
+        var prizeId=  $(this).parent().parent().parent().children().eq(0).text();
+        window.location.href ="/prize/getByIdPrize?prizeId="+prizeId;
+    })
+
+    loadData();
+    var arr=[];
+    var prizeName;
+    function clickPrizeName(){
+        prizeName=$(".prizeName").val();
+        loadData();
+    }
+    function loadData(){
+        layui.use('table', function(){
+            var table = layui.table;
+            //第一个实例
+            table.render({
+                elem: '#demo'
+                ,height: 312
+                ,url: '/prize/getPrizePage' //数据接口
+                ,page: true //开启分页
+                ,cols: [[ //表头
+                    {field: 'id', title: 'ID', width:80, sort: true, fixed: 'left'}
+                    ,{field: 'name', title: '商品名', width:120}
+                    ,{field: 'point', title: '商品积分', width:80, sort: true}
+                    ,{field: 'number', title: '商品数量', width:80}
+                    ,{ title:'操作', toolbar: '#barDemo', width:150}
+                ]]
+                ,where: {
+                    // //.渲染请求参数(查询条件等)
+                    name:prizeName
+                }
+            });
+        });
+    }
+
+</script>
+
+</body>
+</html>

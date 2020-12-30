@@ -1,0 +1,224 @@
+package cn.bdqn.pointsystem.service.impl;
+
+import cn.bdqn.pointsystem.dao.UserMapper;
+import cn.bdqn.pointsystem.emtitys.Grade;
+import cn.bdqn.pointsystem.emtitys.User;
+import cn.bdqn.pointsystem.service.GradeService;
+import cn.bdqn.pointsystem.service.UserService;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * @author yajun
+ * @create 2019/12/27
+ */
+@Service
+public class UserServiceImpl implements UserService {
+
+    @Autowired
+    private UserMapper userMapper;
+
+    @Autowired
+    private GradeService gradeService;
+
+    @Override
+    public User findUserByidentity(String identity) {
+        QueryWrapper<User> wrapper = new QueryWrapper<>();
+        wrapper.eq("identity",identity);
+        return userMapper.selectOne(wrapper);
+    }
+
+    /**
+     * 查询用户总记录数
+     *
+     * @param gradeId 用户表的班级编号
+     * @param isAdmin 用户表的是否为管理员
+     * @param name 用户表的姓名
+     * @return
+     */
+    @Override
+    public int count(Integer gradeId, Integer isAdmin, String name) {
+        return userMapper.getCount(gradeId,isAdmin,name);
+    }
+
+    /**
+     * 用户分页
+     *
+     * @param page
+     * @param gradeId  用户表的班级编号
+     * @param isAdmin  用户表的是否为管理员
+     * @param name  用户表的姓名
+     * @return
+     */
+    @Override
+    public IPage<User> getPageUser(Page page, Integer gradeId, Integer isAdmin, String name) {
+                return userMapper.selectPageUser(page,gradeId,isAdmin,name);
+    }
+
+    /**
+     * @Description 使用xlsx文件添加数据
+     * @Param
+     * @Date 2020/1/3 10:29
+     * @auther zhaomengliang
+     */
+    @Override
+    public String batchImport(String fileName, MultipartFile file) throws Exception {
+        String notNull = "0";
+        List<User> userList = new ArrayList<User>();
+        if (!fileName.matches("^.+\\.(?i)(xls)$") && !fileName.matches("^.+\\.(?i)(xlsx)$")) {
+            return "上传文件格式不正确";
+        }
+        boolean isExcel2003 = true;
+        if (fileName.matches("^.+\\.(?i)(xlsx)$")) {
+            isExcel2003 = false;
+        }
+        InputStream is = file.getInputStream();
+        Workbook wb = null;
+        if (isExcel2003) {
+            wb = new HSSFWorkbook(is);
+        } else {
+            wb = new XSSFWorkbook(is);
+        }
+        Sheet sheet = wb.getSheetAt(0);
+        if(sheet!=null){
+            notNull = "1";
+        }
+        User user;
+        for (int r = 1; r <= sheet.getLastRowNum(); r++) {
+            Row row = sheet.getRow(r);
+            if (row == null) {
+                continue;
+            }
+
+           /* if( row.getCell(0).getCellType() !=1){
+                throw new Exception("导入失败(第"+(r+1)+"行,姓名请设为文本格式)");
+            }*/
+            String name = row.getCell(0).getStringCellValue();
+            if (name == null || name.isEmpty()) {
+                return "导入失败(第" + (r + 1) + "列,姓名未填写)";
+            }
+
+            row.getCell(1).setCellType(Cell.CELL_TYPE_STRING);
+            String identity = row.getCell(1).getStringCellValue();
+            if (identity == null || identity.isEmpty()) {
+                return "导入失败(第" + (r + 1) + "列, 身份证号未填写)";
+            }
+            String address = row.getCell(2).getStringCellValue();
+            if (address == null || address.isEmpty()) {
+                return "导入失败(第" + (r + 1) + "列,用户贯籍没填写)";
+            }
+
+            String gradeName = row.getCell(3).getStringCellValue();
+//            int gradeId=0;
+            Grade grade=null;
+            if (gradeName == null || gradeName.isEmpty()) {
+                return "导入失败(第" + (r + 1) + "列,所属班级没填写)";
+            }else{
+                //查询当前班级信息，使用班级名称查询
+                System.out.println(gradeName);
+                grade= gradeService.getGradeId(gradeName);
+                if(grade==null){
+                    //创建班级信息
+                    int a=gradeService.insertGrade(gradeName);
+                    if(a>=0){
+                        //查询班级信息
+                        grade= gradeService.getGradeId(gradeName);
+                    }
+                }
+            }
+
+
+            user = new User();
+            user.setName(name);
+            user.setIdentity(identity);
+            user.setAddress(address);
+            user.setGradeId(grade.getId());
+            userList.add(user);
+
+        }
+
+
+
+
+        for (User user1 : userList) {
+            String content = user1.getIdentity();
+            User cnt = userMapper.selectUserByIdentity(content);
+            if (cnt == null ||null == cnt.getIdentity()) {
+                this.addtUser(user1);
+            } else {
+                user1.setId(cnt.getId());
+                userMapper.updateUserByName(user1);
+            }
+        }
+
+
+        return notNull;
+    }
+
+    @Override
+    public String getSessionIdById(int userId) {
+        return userMapper.getSessionIdById(userId);
+    }
+
+    @Override
+    public User login(String identity, String username) {
+        QueryWrapper<User> wrapper = new QueryWrapper<>();
+        wrapper.eq("identity",identity).eq("name",username);
+        return userMapper.selectOne(wrapper);
+    }
+
+    @Override
+    public Integer updateSession(User user) {
+        return userMapper.updateById(user);
+    }
+
+    @Override
+    public int addtUser(User user) {
+        return userMapper.insert(user);
+    }
+
+    @Override
+    public List<User> selectUsersByGradeId(int gradeId) {
+        return userMapper.findUsersByGradeId(gradeId);
+    }
+
+    @Override
+    public User selectUserById(int id) {
+        return userMapper.selectUserById(id);
+    }
+
+    @Override
+    public int changeUserPoint(int point, int id) {
+        return userMapper.updateUserPoint(point,id);
+    }
+
+    @Override
+    public int changeUser(User user) {
+        return userMapper.updateUser(user);
+    }
+
+    @Override
+    public int removeUser(int id) {
+        return userMapper.delUser(id);
+    }
+
+
+    @Override
+    public List<User> userList() {
+        return userMapper.Listuser();
+    }
+}

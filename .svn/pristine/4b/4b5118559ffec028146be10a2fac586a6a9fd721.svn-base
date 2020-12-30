@@ -1,0 +1,167 @@
+
+layui.use(['form','table','layer'],function () {
+     var  table = layui.table
+        , form = layui.form
+        ,layer=layui.layer
+        , $ = layui.jquery;
+    form.on('select(grade)', function(data){
+        alert(111);
+    });
+
+    table.render({
+        elem: '#test'
+        ,height: 'full'
+        ,url: '/grade/grades' //数据接口
+        ,toolbar: '#toolbarDemo' //开启头部工具栏，并为其绑定左侧模板
+        ,defaultToolbar: ['filter', 'exports', 'print', { //自定义头部工具栏右侧图标。如无需自定义，去除该参数即可
+            title: '提示'
+            ,layEvent: 'LAYTABLE_TIPS'
+            ,icon: 'layui-icon-tips'
+        }]
+        ,title: '用户数据表'
+        ,page: { //支持传入 laypage 组件的所有参数（某些参数除外，如：jump/elem） - 详见文档
+            layout: ['limit', 'count', 'prev', 'page', 'next', 'skip'] //自定义分页布局
+            //,curr: 5 //设定初始在第 5 页
+            ,limit:10 //一页显示多少条
+            ,limits:[5,10,15]//每页条数的选择项
+            ,groups: 2 //只显示 2 个连续页码
+            ,first: "首页" //不显示首页
+            ,last: "尾页" //不显示尾页
+
+        }
+        ,cols: [[ //表头
+            {type: 'checkbox', fixed: 'left'}
+            ,{field: 'id', title: 'ID', sort: true, fixed: 'left'}
+            ,{field: 'name', title: '班级名'}
+            ,{field: 'point', title: '积分',  sort: true}
+        ]]
+
+    });
+
+
+
+
+
+
+
+    $("#addGrade").click(function () {
+        var open=layer.open({
+            type: 1,
+            skin: 'layui-layer-rim', //加上边框
+            area: ['350px', '250px'], //宽高
+
+            content: '<form class="layui-form form" style="margin-left: 100px" id="form">  <div class="layui-form-item">\n' +
+                '    <label class="layui-form-label">班级名</label>\n' +
+                '    <div class="layui-input-inline">\n' +
+                '      <input type="text" name="name" id="name"  placeholder="请输入班级名" required lay-verify="required"  class="layui-input">\n' +
+                '    </div>\n' +
+                ' <div class="layui-input-inline"><input type="button" value="新增" class="layui-btn layui-btn-primary" style="margin: 50px" id="submit"></div> </div>' +
+                '</form>'
+        });
+        //新增点击事件
+        $("#submit").click(function () {
+            var name=$("#name").val();
+            if(name==""||name==null){
+                layer.msg("班级名不能为空！");
+                return false;
+            }
+            $.getJSON("/grade/addGrade","name="+name,function (data) {
+                if(data!=null){
+                    if(data.toString()=="true"){
+                        layer.alert("添加成功");
+                        layer.close(open);
+                    }else{
+                        layer.alert("添加失败");
+                    }
+
+                }
+            })
+        });
+    });
+
+
+
+
+    //点击加载班级奖罚页面
+    $("#gradeReward").click(function () {
+        $("#content").load("/grade/gradeReward", function () {
+            layui.use('element', function () {
+                var element = layui.element;
+            });
+        });
+    });
+    //点击加载班级信息页面
+    $("#gradePoint").click(function () {
+        $("#content").load("/grade/gradePoint", function () {
+            layui.use('element', function () {
+                var element = layui.element;
+            });
+        });
+    });
+    //点击加载学生信息页面
+    $("#studentPoint").click(function () {
+        $("#content").load("/user/studentPoint", function () {
+            layui.use('element', function () {
+                var element = layui.element;
+            });
+        });
+    });
+
+
+    //点击加载学生奖罚页面
+    $("#studentReward").click(function () {
+        $("#content").load("/user/studentReward", function () {
+            layui.use('element', function () {
+                var element = layui.element;
+            });
+        });
+    });
+
+    //点击退出
+    $("#out").click(function () {
+        $.getJSON("/user/sessionCancellation",function (data) {
+            if(data.toString()=="true"){       //退出
+                window.location.href="/user/login";
+            }
+        })
+    })
+
+    //点击加载积分记录页面
+    $("#integralRecord").click(function () {
+        $("#content").load("/jump/integralRecord", function () {
+            layui.use('element', function () {
+                var element = layui.element;
+            });
+        });
+    });
+
+
+    //点击加载积分记录页面
+    $("#pizeInfo").click(function () {
+        $("#content").load("/jump/prizeInfo", function () {
+            layui.use('element', function () {
+                var element = layui.element;
+            });
+        });
+    });
+
+    //点击加载商品兑换记录
+    $("#pizeExchang").click(function () {
+        $("#content").load("/jump/prizeExchangRecord", function () {
+            layui.use('element', function () {
+                var element = layui.element;
+            });
+        });
+    });
+
+    //点击加载商品兑换记录
+    $("#userInfo").click(function () {
+        $("#content").load("/jump/user", function () {
+            layui.use('element', function () {
+                var element = layui.element;
+            });
+        });
+    });
+});
+
+

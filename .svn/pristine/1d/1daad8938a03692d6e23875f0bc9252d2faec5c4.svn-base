@@ -1,0 +1,52 @@
+
+$(document).on('click',"#addGrade",function(){
+
+    layer.open({
+        type: 1,
+        skin: 'layui-layer-rim', //加上边框
+        area: ['350px', '360px'], //宽高
+        content:'<div class="layui-form-item">\n' +
+            '                            <label class="layui-form-label">记录</label>\n' +
+            '                               <div class="layui-input-inline">\n' +
+            '                                  <input type="text" name="cause" id="name"  placeholder="请输入记录" required lay-verify="required"  class="layui-input">\n' +
+            '                               </div>\n' +
+            '                            <div class="layui-input-inline">\n' +
+            '                                <input type="button" value="添加" class="layui-btn layui-btn-primary add" style="margin: 50px" onclick="add()">\n' +
+            '                            </div>\n' +
+            '                        </div>'
+    });
+});
+
+function add(){
+    var cause=$("#name").val();
+    // var cause= $(" input[ name='cause' ] ").val();
+    // alert(cause);
+    $.getJSON("/cause/add","cause="+cause,function (data) {
+        if(data!=null){
+            if(data.toString()=="true"){
+                layer.msg("新增原因成功！");
+                $("#name").val("");
+                //刷新table
+                layui.use('table',function () {
+                    var table = layui.table
+                    //第一个实例
+                    table.render({
+                        elem: '#demo'
+                        ,height: 'full'
+                        ,limit: 10
+                        ,url: '/cause/selecCausePage' //数据接口
+                        ,page: true //开启分页
+
+                        ,cols: [[ //表头
+                            {type:'checkbox', fixed: 'left'}
+                            ,{field: 'id', title: 'ID',  sort: true, fixed: 'left'}
+                            ,{field: 'cause', title: '信息'}
+                        ]]
+                    });
+                })
+            }else{
+                layer.msg("新增原因失败！");
+            }
+        }
+    })
+}

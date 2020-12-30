@@ -1,0 +1,42 @@
+package cn.bdqn.controller;
+
+import cn.bdqn.pointsystem.emtitys.Grade;
+import cn.bdqn.pointsystem.service.GradeService;
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * @Classname GradeController
+ * @Description TODO
+ * @Date 2019/12/27 18:30
+ * @Created by Administrator
+ */
+@Controller
+@RequestMapping("/grade")
+public class GradeController {
+
+    @Autowired
+    private GradeService gradeService;
+    @ResponseBody
+    @RequestMapping("/gradeList")
+    public Object gradeList(Page<Grade> page,
+                            @RequestParam(required = false) String gradeName, Model model){
+       // PageInfo<Grade> gradeList = gradeService.getGradeList(pageStart, pageSize, grade);//获取班级集合 分页
+//        List<Grade> gradeList = gradeService.getGradeList(grade);
+        Map<Object,Object> map=new HashMap<>();
+        IPage<Grade> gradeIPage = gradeService.selectPageGrade(page, gradeName);
+        map.put("gradeIpage",gradeIPage);
+        return map;//跳转班级页面
+    }
+}
